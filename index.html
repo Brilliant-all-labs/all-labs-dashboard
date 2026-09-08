@@ -223,6 +223,30 @@
     padding-top: 16px;
     border-top: 1px solid var(--line);
   }
+
+  @media (min-width: 768px) {
+    .page {
+      max-width: 1120px;
+      padding: 40px 32px 60px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      align-items: start;
+      gap: 0 48px;
+    }
+
+    .main-grid section {
+      margin-bottom: 0;
+    }
+
+    #trend-section .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 14px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -236,22 +260,26 @@
     </div>
   </header>
 
-  <section id="trend-section">
-    <h2>트렌드 체커</h2>
-    <p class="section-sub">수집시각 최신순 · 데이터랩추세 상승세는 강조 표시됩니다</p>
-    <div id="trend-cards" class="cards">
-      <div class="empty-state">불러오는 중...</div>
-    </div>
-  </section>
+  <div class="main-grid">
 
-  <section id="blog-section">
-    <h2>블로그 발행 현황</h2>
-    <p class="section-sub">all_labs 자동화 파이프라인 연동 예정</p>
-    <div class="placeholder-card">
-      준비 중입니다.<br>
-      트렌드 체커 시트에 "블로그현황" 탭이 추가되면 이 영역에 발행 상태가 표시됩니다.
-    </div>
-  </section>
+    <section id="trend-section">
+      <h2>트렌드 체커</h2>
+      <p class="section-sub">수집시각 최신순 · 데이터랩추세 상승세는 강조 표시됩니다</p>
+      <div id="trend-cards" class="cards">
+        <div class="empty-state">불러오는 중...</div>
+      </div>
+    </section>
+
+    <section id="blog-section">
+      <h2>블로그 발행 현황</h2>
+      <p class="section-sub">all_labs 자동화 파이프라인 연동 예정</p>
+      <div class="placeholder-card">
+        준비 중입니다.<br>
+        트렌드 체커 시트에 "블로그현황" 탭이 추가되면 이 영역에 발행 상태가 표시됩니다.
+      </div>
+    </section>
+
+  </div>
 
   <footer>all_labs internal dashboard</footer>
 
