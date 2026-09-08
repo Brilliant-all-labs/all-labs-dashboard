@@ -203,7 +203,8 @@
 
   table.blog-table {
     width: 100%;
-    min-width: 460px;
+    min-width: 720px;
+    table-layout: fixed;
     border-collapse: collapse;
     font-family: var(--sans);
     font-size: 0.83rem;
@@ -215,6 +216,11 @@
     text-align: left;
     border-bottom: 1px solid var(--line);
     vertical-align: top;
+    overflow-wrap: break-word;
+  }
+
+  table.blog-table td.col-category {
+    white-space: nowrap;
   }
 
   table.blog-table thead th {
@@ -583,7 +589,7 @@
       return (
         '<tr' + rowCls + '>' +
           '<td>' + escapeHtml(row.date) + '</td>' +
-          '<td>' + escapeHtml(row.category) + '</td>' +
+          '<td class="col-category">' + escapeHtml(row.category) + '</td>' +
           '<td>' + escapeHtml(row.topic) + '</td>' +
           '<td><span class="pill ' + pillCls + '">' + escapeHtml(row.status) + '</span></td>' +
           '<td>' + escapeHtml(row.note) + '</td>' +
@@ -594,6 +600,13 @@
     container.innerHTML =
       '<div class="table-wrap">' +
         '<table class="blog-table">' +
+          '<colgroup>' +
+            '<col style="width:90px">' +
+            '<col style="width:100px">' +
+            '<col style="width:240px">' +
+            '<col style="width:90px">' +
+            '<col>' +
+          '</colgroup>' +
           '<thead><tr>' +
             '<th>날짜</th><th>카테고리</th><th>소재</th><th>상태</th><th>비고</th>' +
           '</tr></thead>' +
