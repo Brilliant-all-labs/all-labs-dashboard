@@ -24,6 +24,10 @@
     --badge-google-fg: #2a4d8f;
     --badge-daum-bg: #fdeef0;
     --badge-daum-fg: #a3223f;
+    --status-done-bg: #eef0ec;
+    --status-done-fg: #8b9088;
+    --status-pending-bg: #fdf1e3;
+    --status-pending-fg: #8a4b00;
   }
 
   * { box-sizing: border-box; }
@@ -204,6 +208,56 @@
     font-size: 0.85rem;
   }
 
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--card-bg);
+  }
+
+  table.blog-table {
+    width: 100%;
+    min-width: 460px;
+    border-collapse: collapse;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.8rem;
+  }
+
+  table.blog-table th,
+  table.blog-table td {
+    padding: 9px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  table.blog-table thead th {
+    color: var(--fg-muted);
+    font-weight: 600;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  table.blog-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  table.blog-table tbody tr.status-row-pending {
+    background: rgba(253, 241, 227, 0.35);
+  }
+
+  .status-badge {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .status-done { background: var(--status-done-bg); color: var(--status-done-fg); font-weight: 600; }
+  .status-pending { background: var(--status-pending-bg); color: var(--status-pending-fg); }
+
   .empty-state, .error-state {
     padding: 20px 16px;
     text-align: center;
@@ -272,10 +326,9 @@
 
     <section id="blog-section">
       <h2>블로그 발행 현황</h2>
-      <p class="section-sub">all_labs 자동화 파이프라인 연동 예정</p>
-      <div class="placeholder-card">
-        준비 중입니다.<br>
-        트렌드 체커 시트에 "블로그현황" 탭이 추가되면 이 영역에 발행 상태가 표시됩니다.
+      <p class="section-sub">날짜 최신순 · 발행완료는 옅게, 검수 대기는 강조 표시됩니다</p>
+      <div id="blog-content">
+        <div class="empty-state">불러오는 중...</div>
       </div>
     </section>
 
@@ -297,17 +350,15 @@
   // gviz JSON endpoint.
   var CONFIG = {
     SHEET_ID: "12MW8UkLTqWtvbQXHkLe3-Tv1s5zHIfjaZmL2x161ZTs",
-    TREND_SHEET_NAME: "Sheet1",   // TODO: confirm actual published sheet/tab name
-    BLOG_SHEET_NAME: null,        // future: "블로그현황" tab, not yet published
-    // Flip to false once the sheet has been published to the web and
-    // TREND_SHEET_NAME is confirmed.
+    TREND_SHEET_NAME: "Sheet1",
+    BLOG_SHEET_NAME: "블로그현황",
     USE_DUMMY_DATA: false,
     REFRESH_MS: 30000
   };
 
   function gvizUrl(sheetName) {
     return "https://docs.google.com/spreadsheets/d/" + CONFIG.SHEET_ID +
-      "/gviz/tq?tqx=out:json&sheet=" + encodeURIComponent(sheetName);
+      "/gviz/tq?tqx=out:json&headers=1&sheet=" + encodeURIComponent(sheetName);
   }
 
   // ---------------------------------------------------------------------
@@ -361,42 +412,75 @@
   // ---------------------------------------------------------------------
   // gviz JSON parsing
   // ---------------------------------------------------------------------
-  function parseGvizResponse(text) {
+  function parseGvizTable(text) {
     var match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/);
     if (!match) throw new Error("gviz 응답 형식을 해석할 수 없습니다");
     var json = JSON.parse(match[1]);
     var cols = json.table.cols.map(function (c) { return (c.label || "").trim(); });
+    return { cols: cols, rows: json.table.rows || [] };
+  }
 
-    function colIndex(keyword) {
-      for (var i = 0; i < cols.length; i++) {
-        if (cols[i].indexOf(keyword) !== -1) return i;
-      }
-      return -1;
+  function gvizColIndex(cols, keyword) {
+    for (var i = 0; i < cols.length; i++) {
+      if (cols[i].indexOf(keyword) !== -1) return i;
     }
+    return -1;
+  }
 
+  function gvizCellText(cell) {
+    if (!cell) return "";
+    return (cell.f !== undefined ? cell.f : cell.v) || "";
+  }
+
+  function fetchGvizSheet(sheetName) {
+    return fetch(gvizUrl(sheetName), { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.text();
+      })
+      .then(parseGvizTable);
+  }
+
+  function parseTrendTable(table) {
     var idx = {
-      collectedAt: colIndex("수집시각"),
-      keyword: colIndex("키워드"),
-      source: colIndex("소스"),
-      trend: colIndex("데이터랩"),
-      competition: colIndex("문서수"),
-      news: colIndex("관련뉴스")
+      collectedAt: gvizColIndex(table.cols, "수집시각"),
+      keyword: gvizColIndex(table.cols, "키워드"),
+      source: gvizColIndex(table.cols, "소스"),
+      trend: gvizColIndex(table.cols, "데이터랩"),
+      competition: gvizColIndex(table.cols, "문서수"),
+      news: gvizColIndex(table.cols, "관련뉴스")
     };
 
-    function cellText(cell) {
-      if (!cell) return "";
-      return (cell.f !== undefined ? cell.f : cell.v) || "";
-    }
-
-    return json.table.rows.map(function (row) {
+    return table.rows.map(function (row) {
       var c = row.c;
       return {
-        collectedAt: String(cellText(c[idx.collectedAt])),
-        keyword: String(cellText(c[idx.keyword])),
-        source: String(cellText(c[idx.source])).toLowerCase(),
-        trend: String(cellText(c[idx.trend])),
-        competition: cellText(c[idx.competition]),
-        news: String(cellText(c[idx.news]))
+        collectedAt: String(gvizCellText(c[idx.collectedAt])),
+        keyword: String(gvizCellText(c[idx.keyword])),
+        source: String(gvizCellText(c[idx.source])).toLowerCase(),
+        trend: String(gvizCellText(c[idx.trend])),
+        competition: gvizCellText(c[idx.competition]),
+        news: String(gvizCellText(c[idx.news]))
+      };
+    });
+  }
+
+  function parseBlogTable(table) {
+    var idx = {
+      date: gvizColIndex(table.cols, "날짜"),
+      category: gvizColIndex(table.cols, "카테고리"),
+      topic: gvizColIndex(table.cols, "소재"),
+      status: gvizColIndex(table.cols, "상태"),
+      note: gvizColIndex(table.cols, "비고")
+    };
+
+    return table.rows.map(function (row) {
+      var c = row.c;
+      return {
+        date: String(gvizCellText(c[idx.date])),
+        category: String(gvizCellText(c[idx.category])),
+        topic: String(gvizCellText(c[idx.topic])),
+        status: String(gvizCellText(c[idx.status])),
+        note: String(gvizCellText(c[idx.note]))
       };
     });
   }
@@ -405,12 +489,11 @@
     if (CONFIG.USE_DUMMY_DATA) {
       return Promise.resolve(getDummyRows());
     }
-    return fetch(gvizUrl(CONFIG.TREND_SHEET_NAME), { cache: "no-store" })
-      .then(function (res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.text();
-      })
-      .then(parseGvizResponse);
+    return fetchGvizSheet(CONFIG.TREND_SHEET_NAME).then(parseTrendTable);
+  }
+
+  function fetchBlogRows() {
+    return fetchGvizSheet(CONFIG.BLOG_SHEET_NAME).then(parseBlogTable);
   }
 
   // ---------------------------------------------------------------------
@@ -483,8 +566,62 @@
     }).join("");
   }
 
-  function renderError(err) {
+  function renderTrendError(err) {
     var container = document.getElementById("trend-cards");
+    container.innerHTML = '<div class="error-state">데이터를 불러오지 못했습니다: ' +
+      escapeHtml(err.message || String(err)) + '</div>';
+  }
+
+  function parseDate(str) {
+    var t = Date.parse(str.replace(" ", "T"));
+    return isNaN(t) ? 0 : t;
+  }
+
+  function statusClass(status) {
+    if (status.indexOf("검수") !== -1) return "status-pending";
+    if (status.indexOf("발행완료") !== -1) return "status-done";
+    return "";
+  }
+
+  function renderBlogRows(rows) {
+    var container = document.getElementById("blog-content");
+
+    if (!rows || rows.length === 0) {
+      container.innerHTML = '<div class="empty-state">표시할 데이터가 없습니다</div>';
+      return;
+    }
+
+    var sorted = rows.slice().sort(function (a, b) {
+      return parseDate(b.date) - parseDate(a.date);
+    });
+
+    var body = sorted.map(function (row) {
+      var cls = statusClass(row.status);
+      var rowCls = cls === "status-pending" ? ' class="status-row-pending"' : "";
+      return (
+        '<tr' + rowCls + '>' +
+          '<td>' + escapeHtml(row.date) + '</td>' +
+          '<td>' + escapeHtml(row.category) + '</td>' +
+          '<td>' + escapeHtml(row.topic) + '</td>' +
+          '<td><span class="status-badge ' + cls + '">' + escapeHtml(row.status) + '</span></td>' +
+          '<td>' + escapeHtml(row.note) + '</td>' +
+        '</tr>'
+      );
+    }).join("");
+
+    container.innerHTML =
+      '<div class="table-wrap">' +
+        '<table class="blog-table">' +
+          '<thead><tr>' +
+            '<th>날짜</th><th>카테고리</th><th>소재</th><th>상태</th><th>비고</th>' +
+          '</tr></thead>' +
+          '<tbody>' + body + '</tbody>' +
+        '</table>' +
+      '</div>';
+  }
+
+  function renderBlogError(err) {
+    var container = document.getElementById("blog-content");
     container.innerHTML = '<div class="error-state">데이터를 불러오지 못했습니다: ' +
       escapeHtml(err.message || String(err)) + '</div>';
   }
@@ -505,7 +642,11 @@
         renderTrendRows(rows);
         setLastUpdated();
       })
-      .catch(renderError);
+      .catch(renderTrendError);
+
+    fetchBlogRows()
+      .then(renderBlogRows)
+      .catch(renderBlogError);
   }
 
   document.getElementById("refresh-label").textContent =
