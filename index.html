@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>all_labs 대시보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #04342C;
+    --accent-soft: #0b5445;
+    --bg: #faf8f3;
+    --card-bg: #ffffff;
+    --fg: #1c1c1a;
+    --fg-muted: #6b6b64;
+    --line: rgba(4, 52, 44, 0.14);
+    --up-bg: #eaf3ee;
+    --up-fg: #0b5c3f;
+    --warn-bg: #fdf1e3;
+    --warn-fg: #8a4b00;
+    --badge-google-bg: #eef3fb;
+    --badge-google-fg: #2a4d8f;
+    --badge-daum-bg: #fdeef0;
+    --badge-daum-fg: #a3223f;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Noto Serif KR", "Noto Serif CJK KR", serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 28px 18px 60px;
+  }
+
+  header.top {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+  }
+
+  header.top h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+    color: var(--accent);
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    font-size: 0.82rem;
+    color: var(--fg-muted);
+  }
+
+  .live-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--up-fg);
+    margin-right: 6px;
+    animation: pulse 1.8s ease-in-out infinite;
+    vertical-align: middle;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  section {
+    margin-bottom: 40px;
+  }
+
+  section h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--accent);
+  }
+
+  section .section-sub {
+    font-size: 0.78rem;
+    color: var(--fg-muted);
+    margin: 0 0 16px;
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 16px;
+    position: relative;
+  }
+
+  .card.trend-up {
+    border-left: 3px solid var(--up-fg);
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .keyword {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--fg);
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .badge-google { background: var(--badge-google-bg); color: var(--badge-google-fg); }
+  .badge-daum { background: var(--badge-daum-bg); color: var(--badge-daum-fg); }
+
+  .card-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 0.82rem;
+    color: var(--fg-muted);
+    margin-bottom: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .card-stats b { color: var(--fg); font-weight: 600; }
+
+  .trend-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-weight: 600;
+  }
+
+  .trend-pill.up { color: var(--up-fg); }
+
+  .news-line {
+    font-size: 0.82rem;
+    color: var(--fg-muted);
+    padding-top: 8px;
+    border-top: 1px dashed var(--line);
+  }
+
+  .ethics-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--warn-bg);
+    color: var(--warn-fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+  }
+
+  .timestamp {
+    font-size: 0.72rem;
+    color: var(--fg-muted);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin-top: 8px;
+  }
+
+  .placeholder-card {
+    background: var(--card-bg);
+    border: 1px dashed var(--line);
+    border-radius: 4px;
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--fg-muted);
+    font-size: 0.85rem;
+  }
+
+  .empty-state, .error-state {
+    padding: 20px 16px;
+    text-align: center;
+    color: var(--fg-muted);
+    font-size: 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--card-bg);
+  }
+
+  .error-state { color: var(--badge-daum-fg); }
+
+  footer {
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--fg-muted);
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <h1>all_labs 대시보드</h1>
+    <div class="meta-row">
+      <span><span class="live-dot"></span><span id="refresh-label">30초마다 갱신 중</span></span>
+      <span>마지막 갱신: <strong id="last-updated">-</strong></span>
+    </div>
+  </header>
+
+  <section id="trend-section">
+    <h2>트렌드 체커</h2>
+    <p class="section-sub">수집시각 최신순 · 데이터랩추세 상승세는 강조 표시됩니다</p>
+    <div id="trend-cards" class="cards">
+      <div class="empty-state">불러오는 중...</div>
+    </div>
+  </section>
+
+  <section id="blog-section">
+    <h2>블로그 발행 현황</h2>
+    <p class="section-sub">all_labs 자동화 파이프라인 연동 예정</p>
+    <div class="placeholder-card">
+      준비 중입니다.<br>
+      트렌드 체커 시트에 "블로그현황" 탭이 추가되면 이 영역에 발행 상태가 표시됩니다.
+    </div>
+  </section>
+
+  <footer>all_labs internal dashboard</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------------
+  // Config
+  // ---------------------------------------------------------------------
+  // Public read-only Google Sheet (via "파일 → 공유 → 웹에 게시").
+  // No credentials involved: this is a client-side fetch of a published
+  // gviz JSON endpoint.
+  var CONFIG = {
+    SHEET_ID: "12MW8UkLTqWtvbQXHkLe3-Tv1s5zHIfjaZmL2x161ZTs",
+    TREND_SHEET_NAME: "Sheet1",   // TODO: confirm actual published sheet/tab name
+    BLOG_SHEET_NAME: null,        // future: "블로그현황" tab, not yet published
+    // Flip to false once the sheet has been published to the web and
+    // TREND_SHEET_NAME is confirmed.
+    USE_DUMMY_DATA: true,
+    REFRESH_MS: 30000
+  };
+
+  function gvizUrl(sheetName) {
+    return "https://docs.google.com/spreadsheets/d/" + CONFIG.SHEET_ID +
+      "/gviz/tq?tqx=out:json&sheet=" + encodeURIComponent(sheetName);
+  }
+
+  // ---------------------------------------------------------------------
+  // Dummy data (used until the real sheet is published)
+  // ---------------------------------------------------------------------
+  function getDummyRows() {
+    return [
+      {
+        collectedAt: "2026-09-08 14:20",
+        keyword: "제주도 가을 여행",
+        source: "google",
+        trend: "상승세",
+        competition: 128,
+        news: "제주 단풍 명소 특집 기사 다수"
+      },
+      {
+        collectedAt: "2026-09-08 14:20",
+        keyword: "실종 고양이 찾기",
+        source: "daum",
+        trend: "상승세",
+        competition: 34,
+        news: "주의: 실종 - 관련 실종 사건 보도 확인됨"
+      },
+      {
+        collectedAt: "2026-09-08 13:55",
+        keyword: "에어프라이어 レシピ",
+        source: "google",
+        trend: "보통",
+        competition: 512,
+        news: "특이 이슈 없음"
+      },
+      {
+        collectedAt: "2026-09-08 13:55",
+        keyword: "전기차 보조금 2026",
+        source: "daum",
+        trend: "하락세",
+        competition: 76,
+        news: "정부 정책 발표 관련 기사"
+      },
+      {
+        collectedAt: "2026-09-08 13:30",
+        keyword: "홈트레이닝 루틴",
+        source: "google",
+        trend: "상승세",
+        competition: 210,
+        news: "특이 이슈 없음"
+      }
+    ];
+  }
+
+  // ---------------------------------------------------------------------
+  // gviz JSON parsing
+  // ---------------------------------------------------------------------
+  function parseGvizResponse(text) {
+    var match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/);
+    if (!match) throw new Error("gviz 응답 형식을 해석할 수 없습니다");
+    var json = JSON.parse(match[1]);
+    var cols = json.table.cols.map(function (c) { return (c.label || "").trim(); });
+
+    function colIndex(keyword) {
+      for (var i = 0; i < cols.length; i++) {
+        if (cols[i].indexOf(keyword) !== -1) return i;
+      }
+      return -1;
+    }
+
+    var idx = {
+      collectedAt: colIndex("수집시각"),
+      keyword: colIndex("키워드"),
+      source: colIndex("소스"),
+      trend: colIndex("데이터랩"),
+      competition: colIndex("문서수"),
+      news: colIndex("관련뉴스")
+    };
+
+    function cellText(cell) {
+      if (!cell) return "";
+      return (cell.f !== undefined ? cell.f : cell.v) || "";
+    }
+
+    return json.table.rows.map(function (row) {
+      var c = row.c;
+      return {
+        collectedAt: String(cellText(c[idx.collectedAt])),
+        keyword: String(cellText(c[idx.keyword])),
+        source: String(cellText(c[idx.source])).toLowerCase(),
+        trend: String(cellText(c[idx.trend])),
+        competition: cellText(c[idx.competition]),
+        news: String(cellText(c[idx.news]))
+      };
+    });
+  }
+
+  function fetchTrendRows() {
+    if (CONFIG.USE_DUMMY_DATA) {
+      return Promise.resolve(getDummyRows());
+    }
+    return fetch(gvizUrl(CONFIG.TREND_SHEET_NAME), { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.text();
+      })
+      .then(parseGvizResponse);
+  }
+
+  // ---------------------------------------------------------------------
+  // Rendering
+  // ---------------------------------------------------------------------
+  function isUpTrend(trend) {
+    return trend.indexOf("상승") !== -1;
+  }
+
+  function ethicsFlag(news) {
+    var m = news.match(/주의\s*:\s*[^\s,]+/);
+    return m ? m[0] : null;
+  }
+
+  function sourceBadge(source) {
+    if (source.indexOf("daum") !== -1 || source.indexOf("다음") !== -1) {
+      return '<span class="badge badge-daum">다음</span>';
+    }
+    return '<span class="badge badge-google">구글</span>';
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function parseTimestamp(str) {
+    var t = Date.parse(str.replace(" ", "T"));
+    return isNaN(t) ? 0 : t;
+  }
+
+  function renderTrendRows(rows) {
+    var container = document.getElementById("trend-cards");
+
+    if (!rows || rows.length === 0) {
+      container.innerHTML = '<div class="empty-state">표시할 데이터가 없습니다</div>';
+      return;
+    }
+
+    var sorted = rows.slice().sort(function (a, b) {
+      return parseTimestamp(b.collectedAt) - parseTimestamp(a.collectedAt);
+    });
+
+    container.innerHTML = sorted.map(function (row) {
+      var up = isUpTrend(row.trend);
+      var flag = ethicsFlag(row.news);
+      var flagHtml = flag
+        ? '<div class="ethics-flag">⚠ ' + escapeHtml(flag) + '</div>'
+        : "";
+
+      return (
+        '<div class="card' + (up ? " trend-up" : "") + '">' +
+          '<div class="card-top">' +
+            '<span class="keyword">' + escapeHtml(row.keyword) + '</span>' +
+            sourceBadge(row.source) +
+          '</div>' +
+          '<div class="card-stats">' +
+            '<span class="trend-pill' + (up ? " up" : "") + '">' +
+              (up ? "▲ " : "") + escapeHtml(row.trend) +
+            '</span>' +
+            '<span>경쟁도 <b>' + escapeHtml(row.competition) + '</b></span>' +
+          '</div>' +
+          flagHtml +
+          '<div class="news-line">' + escapeHtml(row.news) + '</div>' +
+          '<div class="timestamp">' + escapeHtml(row.collectedAt) + '</div>' +
+        '</div>'
+      );
+    }).join("");
+  }
+
+  function renderError(err) {
+    var container = document.getElementById("trend-cards");
+    container.innerHTML = '<div class="error-state">데이터를 불러오지 못했습니다: ' +
+      escapeHtml(err.message || String(err)) + '</div>';
+  }
+
+  function setLastUpdated() {
+    var el = document.getElementById("last-updated");
+    el.textContent = new Date().toLocaleString("ko-KR", {
+      hour: "2-digit", minute: "2-digit", second: "2-digit"
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  // Main loop
+  // ---------------------------------------------------------------------
+  function tick() {
+    fetchTrendRows()
+      .then(function (rows) {
+        renderTrendRows(rows);
+        setLastUpdated();
+      })
+      .catch(renderError);
+  }
+
+  document.getElementById("refresh-label").textContent =
+    Math.round(CONFIG.REFRESH_MS / 1000) + "초마다 갱신 중";
+
+  tick();
+  setInterval(tick, CONFIG.REFRESH_MS);
+})();
+</script>
+</body>
+</html>
