@@ -9,25 +9,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
+    --serif: "Noto Serif KR", "Noto Serif CJK KR", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", "Noto Sans KR", sans-serif;
+
     --accent: #04342C;
-    --accent-soft: #0b5445;
+    --accent-tint: rgba(4, 52, 44, 0.07);
+    --accent-tint-strong: rgba(4, 52, 44, 0.16);
+
     --bg: #faf8f3;
-    --card-bg: #ffffff;
     --fg: #1c1c1a;
-    --fg-muted: #6b6b64;
-    --line: rgba(4, 52, 44, 0.14);
-    --up-bg: #eaf3ee;
-    --up-fg: #0b5c3f;
-    --warn-bg: #fdf1e3;
-    --warn-fg: #8a4b00;
-    --badge-google-bg: #eef3fb;
-    --badge-google-fg: #2a4d8f;
-    --badge-daum-bg: #fdeef0;
-    --badge-daum-fg: #a3223f;
-    --status-done-bg: #eef0ec;
-    --status-done-fg: #8b9088;
-    --status-pending-bg: #fdf1e3;
-    --status-pending-fg: #8a4b00;
+    --fg-muted: #7c7c74;
+    --fg-faint: #a3a39a;
+    --line: rgba(28, 28, 26, 0.11);
+
+    --down-fg: #8a4a46;
+    --down-bg: rgba(138, 74, 70, 0.08);
+
+    --neutral-fg: #7c7c74;
+    --neutral-bg: rgba(28, 28, 26, 0.05);
+
+    --pending-fg: #8a5a00;
+    --pending-bg: rgba(138, 90, 0, 0.09);
+
+    --flag-fg: #8a2f2f;
+    --flag-bg: rgba(138, 47, 47, 0.08);
   }
 
   * { box-sizing: border-box; }
@@ -37,28 +42,29 @@
     padding: 0;
     background: var(--bg);
     color: var(--fg);
-    font-family: "Noto Serif KR", "Noto Serif CJK KR", serif;
-    line-height: 1.55;
+    font-family: var(--sans);
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
 
   .page {
     max-width: 720px;
     margin: 0 auto;
-    padding: 28px 18px 60px;
+    padding: 40px 20px 72px;
   }
 
   header.top {
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 18px;
-    margin-bottom: 24px;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 22px;
+    margin-bottom: 36px;
   }
 
   header.top h1 {
-    font-size: 1.5rem;
+    font-family: var(--serif);
+    font-size: 2rem;
     font-weight: 700;
     letter-spacing: -0.01em;
-    margin: 0 0 10px;
+    margin: 0 0 12px;
     color: var(--accent);
   }
 
@@ -67,16 +73,16 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 8px 14px;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: var(--fg-muted);
   }
 
   .live-dot {
     display: inline-block;
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: var(--up-fg);
+    background: var(--accent);
     margin-right: 6px;
     animation: pulse 1.8s ease-in-out infinite;
     vertical-align: middle;
@@ -84,148 +90,128 @@
 
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.35; }
+    50% { opacity: 0.3; }
   }
 
   section {
-    margin-bottom: 40px;
+    margin-bottom: 48px;
   }
 
   section h2 {
-    font-size: 1.05rem;
+    font-family: var(--serif);
+    font-size: 1.25rem;
     font-weight: 700;
-    margin: 0 0 4px;
+    margin: 0 0 6px;
     color: var(--accent);
   }
 
   section .section-sub {
     font-size: 0.78rem;
     color: var(--fg-muted);
-    margin: 0 0 16px;
+    margin: 0 0 20px;
   }
 
-  .cards {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  /* Shared pill / label language ------------------------------------- */
 
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 14px 16px;
-    position: relative;
-  }
-
-  .card.trend-up {
-    border-left: 3px solid var(--up-fg);
-  }
-
-  .card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-
-  .keyword {
-    font-size: 1.02rem;
-    font-weight: 700;
-    color: var(--fg);
-  }
-
-  .badge {
+  .pill {
     display: inline-block;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 0.68rem;
+    font-family: var(--sans);
+    font-size: 0.72rem;
     font-weight: 600;
-    padding: 2px 8px;
+    padding: 2px 10px;
     border-radius: 999px;
     white-space: nowrap;
   }
 
-  .badge-google { background: var(--badge-google-bg); color: var(--badge-google-fg); }
-  .badge-daum { background: var(--badge-daum-bg); color: var(--badge-daum-fg); }
+  .pill-accent  { background: var(--accent-tint); color: var(--accent); }
+  .pill-down    { background: var(--down-bg); color: var(--down-fg); }
+  .pill-neutral { background: var(--neutral-bg); color: var(--neutral-fg); }
+  .pill-warn    { background: var(--pending-bg); color: var(--pending-fg); }
 
-  .card-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 16px;
-    font-size: 0.82rem;
-    color: var(--fg-muted);
-    margin-bottom: 8px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
-
-  .card-stats b { color: var(--fg); font-weight: 600; }
-
-  .trend-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    font-weight: 600;
-  }
-
-  .trend-pill.up { color: var(--up-fg); }
-
-  .news-line {
-    font-size: 0.82rem;
-    color: var(--fg-muted);
-    padding-top: 8px;
-    border-top: 1px dashed var(--line);
-  }
-
-  .ethics-flag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: var(--warn-bg);
-    color: var(--warn-fg);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  .flag-pill {
+    display: inline-block;
+    font-family: var(--sans);
     font-size: 0.72rem;
     font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 3px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--flag-bg);
+    color: var(--flag-fg);
+  }
+
+  .source-label {
+    font-size: 0.72rem;
+    color: var(--fg-faint);
+    letter-spacing: 0.03em;
+  }
+
+  /* Trend list --------------------------------------------------------- */
+
+  .trend-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .trend-row {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .trend-row:first-child { padding-top: 4px; }
+  .trend-row:last-child { border-bottom: none; }
+
+  .row-main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
     margin-bottom: 6px;
   }
 
-  .timestamp {
-    font-size: 0.72rem;
-    color: var(--fg-muted);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    margin-top: 8px;
+  .row-keyword {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--fg);
   }
 
-  .placeholder-card {
-    background: var(--card-bg);
-    border: 1px dashed var(--line);
-    border-radius: 4px;
-    padding: 24px 16px;
-    text-align: center;
+  .row-sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    font-size: 0.83rem;
     color: var(--fg-muted);
-    font-size: 0.85rem;
   }
+
+  .row-sub b { color: var(--fg); font-weight: 600; }
+
+  .row-sub .sep { color: var(--fg-faint); }
+
+  .row-sub .row-news { color: var(--fg-muted); }
+
+  .row-sub .row-time { color: var(--fg-faint); font-size: 0.76rem; }
+
+  .row-flag-line {
+    margin: 6px 0 2px;
+  }
+
+  /* Blog status table ---------------------------------------------------- */
 
   .table-wrap {
     overflow-x: auto;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    background: var(--card-bg);
   }
 
   table.blog-table {
     width: 100%;
     min-width: 460px;
     border-collapse: collapse;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 0.8rem;
+    font-family: var(--sans);
+    font-size: 0.83rem;
   }
 
   table.blog-table th,
   table.blog-table td {
-    padding: 9px 12px;
+    padding: 10px 14px 10px 0;
     text-align: left;
     border-bottom: 1px solid var(--line);
     vertical-align: top;
@@ -236,69 +222,58 @@
     font-weight: 600;
     font-size: 0.72rem;
     white-space: nowrap;
+    border-bottom: 1px solid var(--accent);
   }
 
   table.blog-table tbody tr:last-child td {
     border-bottom: none;
   }
 
-  table.blog-table tbody tr.status-row-pending {
-    background: rgba(253, 241, 227, 0.35);
+  table.blog-table tbody tr.status-row-pending td {
+    background: var(--pending-bg);
   }
 
-  .status-badge {
-    display: inline-block;
-    font-weight: 700;
-    font-size: 0.72rem;
-    padding: 2px 8px;
-    border-radius: 3px;
-    white-space: nowrap;
+  table.blog-table tbody tr.status-row-pending td:first-child {
+    box-shadow: inset 2px 0 0 var(--pending-fg);
   }
-
-  .status-done { background: var(--status-done-bg); color: var(--status-done-fg); font-weight: 600; }
-  .status-pending { background: var(--status-pending-bg); color: var(--status-pending-fg); }
 
   .empty-state, .error-state {
-    padding: 20px 16px;
+    padding: 28px 0;
     text-align: center;
     color: var(--fg-muted);
     font-size: 0.85rem;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    background: var(--card-bg);
+    border-bottom: 1px solid var(--line);
   }
 
-  .error-state { color: var(--badge-daum-fg); }
+  .error-state { color: var(--down-fg); }
 
   footer {
     text-align: center;
     font-size: 0.7rem;
-    color: var(--fg-muted);
-    padding-top: 16px;
+    color: var(--fg-faint);
+    padding-top: 20px;
     border-top: 1px solid var(--line);
   }
 
   @media (min-width: 768px) {
     .page {
       max-width: 1120px;
-      padding: 40px 32px 60px;
+      padding: 56px 32px 80px;
+    }
+
+    header.top h1 {
+      font-size: 2.3rem;
     }
 
     .main-grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
       align-items: start;
-      gap: 0 48px;
+      gap: 0 56px;
     }
 
     .main-grid section {
       margin-bottom: 0;
-    }
-
-    #trend-section .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 14px;
     }
   }
 </style>
@@ -319,7 +294,7 @@
     <section id="trend-section">
       <h2>트렌드 체커</h2>
       <p class="section-sub">수집시각 최신순 · 데이터랩추세 상승세는 강조 표시됩니다</p>
-      <div id="trend-cards" class="cards">
+      <div id="trend-cards" class="trend-list">
         <div class="empty-state">불러오는 중...</div>
       </div>
     </section>
@@ -499,8 +474,10 @@
   // ---------------------------------------------------------------------
   // Rendering
   // ---------------------------------------------------------------------
-  function isUpTrend(trend) {
-    return trend.indexOf("상승") !== -1;
+  function trendPillClass(trend) {
+    if (trend.indexOf("상승") !== -1) return "pill-accent";
+    if (trend.indexOf("하강") !== -1 || trend.indexOf("하락") !== -1) return "pill-down";
+    return "pill-neutral";
   }
 
   function ethicsFlag(news) {
@@ -508,11 +485,11 @@
     return m ? m[0] : null;
   }
 
-  function sourceBadge(source) {
+  function sourceLabel(source) {
     if (source.indexOf("daum") !== -1 || source.indexOf("다음") !== -1) {
-      return '<span class="badge badge-daum">다음</span>';
+      return "다음";
     }
-    return '<span class="badge badge-google">구글</span>';
+    return "구글";
   }
 
   function escapeHtml(str) {
@@ -540,27 +517,28 @@
     });
 
     container.innerHTML = sorted.map(function (row) {
-      var up = isUpTrend(row.trend);
+      var up = row.trend.indexOf("상승") !== -1;
+      var pillCls = trendPillClass(row.trend);
       var flag = ethicsFlag(row.news);
       var flagHtml = flag
-        ? '<div class="ethics-flag">⚠ ' + escapeHtml(flag) + '</div>'
+        ? '<div class="row-flag-line"><span class="flag-pill">⚠ ' + escapeHtml(flag) + '</span></div>'
         : "";
 
       return (
-        '<div class="card' + (up ? " trend-up" : "") + '">' +
-          '<div class="card-top">' +
-            '<span class="keyword">' + escapeHtml(row.keyword) + '</span>' +
-            sourceBadge(row.source) +
-          '</div>' +
-          '<div class="card-stats">' +
-            '<span class="trend-pill' + (up ? " up" : "") + '">' +
-              (up ? "▲ " : "") + escapeHtml(row.trend) +
-            '</span>' +
-            '<span>경쟁도 <b>' + escapeHtml(row.competition) + '</b></span>' +
+        '<div class="trend-row">' +
+          '<div class="row-main">' +
+            '<span class="row-keyword">' + escapeHtml(row.keyword) + '</span>' +
+            '<span class="source-label">' + sourceLabel(row.source) + '</span>' +
+            '<span class="pill ' + pillCls + '">' + (up ? "▲ " : "") + escapeHtml(row.trend) + '</span>' +
           '</div>' +
           flagHtml +
-          '<div class="news-line">' + escapeHtml(row.news) + '</div>' +
-          '<div class="timestamp">' + escapeHtml(row.collectedAt) + '</div>' +
+          '<div class="row-sub">' +
+            '<span>경쟁도 <b>' + escapeHtml(row.competition) + '</b></span>' +
+            '<span class="sep">·</span>' +
+            '<span class="row-news">' + escapeHtml(row.news) + '</span>' +
+            '<span class="sep">·</span>' +
+            '<span class="row-time">' + escapeHtml(row.collectedAt) + '</span>' +
+          '</div>' +
         '</div>'
       );
     }).join("");
@@ -577,10 +555,14 @@
     return isNaN(t) ? 0 : t;
   }
 
-  function statusClass(status) {
-    if (status.indexOf("검수") !== -1) return "status-pending";
-    if (status.indexOf("발행완료") !== -1) return "status-done";
-    return "";
+  function statusPillClass(status) {
+    if (status.indexOf("검수") !== -1) return "pill-warn";
+    if (status.indexOf("발행완료") !== -1) return "pill-neutral";
+    return "pill-neutral";
+  }
+
+  function isPendingStatus(status) {
+    return status.indexOf("검수") !== -1;
   }
 
   function renderBlogRows(rows) {
@@ -596,14 +578,14 @@
     });
 
     var body = sorted.map(function (row) {
-      var cls = statusClass(row.status);
-      var rowCls = cls === "status-pending" ? ' class="status-row-pending"' : "";
+      var pillCls = statusPillClass(row.status);
+      var rowCls = isPendingStatus(row.status) ? ' class="status-row-pending"' : "";
       return (
         '<tr' + rowCls + '>' +
           '<td>' + escapeHtml(row.date) + '</td>' +
           '<td>' + escapeHtml(row.category) + '</td>' +
           '<td>' + escapeHtml(row.topic) + '</td>' +
-          '<td><span class="status-badge ' + cls + '">' + escapeHtml(row.status) + '</span></td>' +
+          '<td><span class="pill ' + pillCls + '">' + escapeHtml(row.status) + '</span></td>' +
           '<td>' + escapeHtml(row.note) + '</td>' +
         '</tr>'
       );
