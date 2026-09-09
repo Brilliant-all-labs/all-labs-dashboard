@@ -299,7 +299,7 @@
 
     <section id="trend-section">
       <h2>트렌드 체커</h2>
-      <p class="section-sub">수집시각 최신순 · 데이터랩추세 상승세는 강조 표시됩니다</p>
+      <p class="section-sub">키워드별 최신 수집 결과만 표시 · 데이터랩추세 상승세는 강조 표시됩니다</p>
       <div id="trend-cards" class="trend-list">
         <div class="empty-state">불러오는 중...</div>
       </div>
@@ -492,9 +492,10 @@
   }
 
   function sourceLabel(source) {
-    if (source.indexOf("daum") !== -1 || source.indexOf("다음") !== -1) {
-      return "다음";
-    }
+    var hasDaum = source.indexOf("daum") !== -1 || source.indexOf("다음") !== -1;
+    var hasGoogle = source.indexOf("google") !== -1 || source.indexOf("구글") !== -1;
+    if (hasDaum && hasGoogle) return "구글·다음";
+    if (hasDaum) return "다음";
     return "구글";
   }
 
@@ -510,6 +511,18 @@
     return isNaN(t) ? 0 : t;
   }
 
+  function dedupeLatestByKeyword(rows) {
+    var seen = {};
+    var result = [];
+    rows.forEach(function (row) {
+      if (!seen[row.keyword]) {
+        seen[row.keyword] = true;
+        result.push(row);
+      }
+    });
+    return result;
+  }
+
   function renderTrendRows(rows) {
     var container = document.getElementById("trend-cards");
 
@@ -522,7 +535,9 @@
       return parseTimestamp(b.collectedAt) - parseTimestamp(a.collectedAt);
     });
 
-    container.innerHTML = sorted.map(function (row) {
+    var deduped = dedupeLatestByKeyword(sorted);
+
+    container.innerHTML = deduped.map(function (row) {
       var up = row.trend.indexOf("상승") !== -1;
       var pillCls = trendPillClass(row.trend);
       var flag = ethicsFlag(row.news);
